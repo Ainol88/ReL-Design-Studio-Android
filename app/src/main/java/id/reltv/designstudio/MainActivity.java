@@ -8,6 +8,7 @@ import android.graphics.pdf.PdfDocument;
 import android.net.Uri;
 import android.view.*;
 import android.widget.*;
+import androidx.core.content.FileProvider;
 import org.json.*;
 import java.io.*;
 import java.util.*;
@@ -80,6 +81,6 @@ public class MainActivity extends Activity {
     File outputDir(){File d=new File(getExternalFilesDir(null),"ReLDesignStudio");if(!d.exists())d.mkdirs();return d;}
     void exportImage(){try{File f=new File(outputDir(),"Desain_"+System.currentTimeMillis()+".png");FileOutputStream out=new FileOutputStream(f);preview.bitmap().compress(Bitmap.CompressFormat.PNG,100,out);out.close();shareFile(f,"image/png");}catch(Exception e){Toast.makeText(this,"Ekspor PNG gagal: "+e.getMessage(),Toast.LENGTH_LONG).show();}}
     void exportPdf(){try{PdfDocument doc=new PdfDocument();PdfDocument.PageInfo info=new PdfDocument.PageInfo.Builder(595,842,1).create();PdfDocument.Page page=doc.startPage(info);Bitmap b=preview.bitmap();page.getCanvas().drawBitmap(b,null,new Rect(24,24,571,818),new Paint(3));doc.finishPage(page);File f=new File(outputDir(),"Desain_"+System.currentTimeMillis()+".pdf");FileOutputStream out=new FileOutputStream(f);doc.writeTo(out);out.close();doc.close();shareFile(f,"application/pdf");}catch(Exception e){Toast.makeText(this,"Ekspor PDF gagal: "+e.getMessage(),Toast.LENGTH_LONG).show();}}
-    void shareFile(File f,String mime){Toast.makeText(this,"File tersimpan di folder Android/data/id.reltv.designstudio/files/ReLDesignStudio",Toast.LENGTH_LONG).show();Intent i=new Intent(Intent.ACTION_SEND);i.setType(mime);i.putExtra(Intent.EXTRA_STREAM,Uri.fromFile(f));i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);try{startActivity(Intent.createChooser(i,"Bagikan desain"));}catch(Exception e){}}
+    void shareFile(File f,String mime){Toast.makeText(this,"File tersimpan di folder Android/data/id.reltv.designstudio/files/ReLDesignStudio",Toast.LENGTH_LONG).show();Intent i=new Intent(Intent.ACTION_SEND);i.setType(mime);i.putExtra(Intent.EXTRA_STREAM,FileProvider.getUriForFile(this,getPackageName()+".provider",f));i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);try{startActivity(Intent.createChooser(i,"Bagikan desain"));}catch(Exception e){}}
     @Override protected void onActivityResult(int r,int c,Intent d){super.onActivityResult(r,c,d);if(r==77&&c==RESULT_OK&&d!=null){try{photo=android.provider.MediaStore.Images.Media.getBitmap(getContentResolver(),d.getData());if(preview!=null)preview.invalidate();}catch(Exception e){Toast.makeText(this,"Foto tidak dapat dibuka",Toast.LENGTH_SHORT).show();}}}
 }
